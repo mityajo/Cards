@@ -1,14 +1,21 @@
 'use strict';
 
-// -------- Create cards --------
+// -------- Constructor for cards --------
 class Card {
-    constructor(src, alt, title, date, parentSelector, ...classes) {
+    constructor(src, alt, title, date, size, parentSelector, ...classes) {
         this.src = src;
         this.alt = alt;
         this.title = title;
         this.date = date;
+        this.size = size;
         this.parent = document.querySelector(parentSelector);
         this.classes = classes;
+        this.changeDate();
+    }
+
+    changeDate() {
+        let d = new Date(this.date);
+        this.date = (d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear());
     }
 
     render() {
@@ -31,34 +38,52 @@ class Card {
     }
 }
 
-new Card(
-    'img/4.jpg',
-    'new pic',
-    'New Picture',
-    '14.12.2021',
-    '.content .cards',
-    // 'cards__item',
-).render();
-
 // ------------------------------
-// -------- Get Request --------
+// -------- Get Request and  --------
 
 const requestURL = 'http://contest.elecard.ru/frontend_data/catalog.json';
-const request = new XMLHttpRequest();
 
-request.open('GET', requestURL);
+function sendRequest(method, url) {
+    const request = new XMLHttpRequest();
 
-request.onload = () => {
-    if (request.status < 400) {
-        const data = JSON.parse(request.response);
-        console.log(data[0].category);
-    } else {
-        console.error(request.response);
-    }
-};
+    request.open(method, url);
 
-request.onerror = () => {
-    console.log(request.response);
-};
+    request.onload = () => {
+        if (request.status < 400) {
+            const data = JSON.parse(request.response);
 
-request.send();
+            data.forEach(item => {
+                new Card(
+                    'https://picsum.photos/200/200',
+                    item.category,
+                    item.category,
+                    item.timestamp,
+                    item.size,
+                    '.content .cards',
+                    'cards__item',
+                ).render();
+            });
+            console.log(data[0]);
+
+            document.querySelectorAll('.cards__item-close').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    btn.parentElement.remove();
+                });
+            });
+
+        } else {
+            console.error(request.response);
+        }
+    };
+
+    request.onerror = () => {
+        console.log(request.response);
+    };
+
+    request.send();
+}
+
+sendRequest('GET', requestURL);
+// ---------------------------------------
+
+// document.querySelector('.btnReset').addEventListener('click', sendRequest);
