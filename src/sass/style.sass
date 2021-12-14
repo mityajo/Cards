@@ -14,19 +14,23 @@
     text-align: center
     position: fixed
     z-index: 10
-    
     &__form p
         display: inline-block
         vertical-align: middle
         line-height: 3
         margin-right: 10px
+    &__form .button
+        width: 120px
+        border-radius: 5px
+        cursor: pointer
+        margin-left: 10%
 
 .container
     max-width: 1200px
     margin: 0 auto
-    padding-top: 90px
 
 .cards
+    padding-top: 80px
     display: flex
     flex-wrap: wrap
     justify-content: space-evenly
@@ -59,7 +63,6 @@
         &__date
             text-align: center
 
-
 .footer
     width: 100%
     height: 70px
@@ -74,7 +77,3 @@
         vertical-align: middle
         line-height: 3
         margin-right: 10px
-    &__form .button
-        width: 120px
-        border-radius: 5px
-        cursor: pointer
