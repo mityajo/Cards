@@ -11,11 +11,35 @@
 
 <body>
     <div class="page">
-        <header class="header">header</header>
+        <header class="header">
+            <form class="header__form">
+                <p>Вид контента:</p>
+                <p><input type="radio" name="display" value="cards" checked> Карточки</p>
+                <p><input type="radio" name="display" value="list"> Список</p>
+            </form>
+        </header>
 
         <main class="content">
             <div class="container">
                 <div class="cards">
+                    <div class="cards__item">
+                        <img src="img/1.jpg" alt="first">
+                        <div class="cards__item__title">title</div>
+                        <div class="cards__item__date">date</div>
+                        <div class="cards__item-close">&#10006;</div>
+                    </div>
+                    <div class="cards__item">
+                        <img src="img/2.jpg" alt="first">
+                        <div class="cards__item__title">title</div>
+                        <div class="cards__item__date">date</div>
+                        <div class="cards__item-close">&#10006;</div>
+                    </div>
+                    <div class="cards__item">
+                        <img src="img/3.jpg" alt="first">
+                        <div class="cards__item__title">title</div>
+                        <div class="cards__item__date">date</div>
+                        <div class="cards__item-close">&#10006;</div>
+                    </div>
                     <div class="cards__item">
                         <img src="img/1.jpg" alt="first">
                         <div class="cards__item-close">&#10006;</div>
@@ -44,9 +68,17 @@
             </div>
         </main>
 
-        <footer class="footer">footer</footer>
+        <footer class="footer">
+            <form class="footer__form">
+                <p>Сортировать:</p>
+                <p><input type="radio" name="sort" value="date" checked> Дата</p>
+                <p><input type="radio" name="sort" value="name"> Название</p>
+                <p><input type="radio" name="sort" value="size"> Размер</p>
+                <input type="button" class="button" value="Сброс">
+            </form>
+        </footer>
     </div>
-    
+
     <script src="js/script.js"></script>
 </body>
 
