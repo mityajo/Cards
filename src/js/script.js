@@ -1,5 +1,16 @@
 'use strict';
 
+// -------- Preloader --------
+document.body.onload = () => {
+    setTimeout(() => {
+        const preloader = document.getElementById('page-preloader');
+        if (!preloader.classList.contains('done')) {
+            preloader.classList.add('done');
+        }
+    }, 1000);
+};
+// ----------------------------
+
 // -------- Constructor for cards --------
 class Card {
     constructor(src, alt, title, date, size, parentSelector, ...classes) {
@@ -37,10 +48,9 @@ class Card {
         this.parent.append(element);
     }
 }
-
 // ------------------------------
-// -------- Get Request and  --------
 
+// -------- Get Request and  --------
 const requestURL = 'http://contest.elecard.ru/frontend_data/catalog.json';
 
 function sendRequest(method, url) {
@@ -54,7 +64,7 @@ function sendRequest(method, url) {
 
             data.forEach(item => {
                 new Card(
-                    'https://picsum.photos/200/200',
+                    'http://contest.elecard.ru/frontend_data/'+item.image,
                     item.category,
                     item.category,
                     item.timestamp,
@@ -63,27 +73,27 @@ function sendRequest(method, url) {
                     'cards__item',
                 ).render();
             });
-            console.log(data[0]);
 
             document.querySelectorAll('.cards__item-close').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     btn.parentElement.remove();
                 });
             });
-
         } else {
             console.error(request.response);
         }
     };
-
     request.onerror = () => {
         console.log(request.response);
     };
-
     request.send();
 }
 
 sendRequest('GET', requestURL);
 // ---------------------------------------
 
-// document.querySelector('.btnReset').addEventListener('click', sendRequest);
+const cards = document.querySelector('.cards');
+
+cards.onload = () => {
+    console.log('Loaded');
+};
