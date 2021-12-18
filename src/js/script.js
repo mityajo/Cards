@@ -1,15 +1,12 @@
 'use strict';
 
-// -------- Preloader --------
-document.body.onload = () => {
-    setTimeout(() => {
-        const preloader = document.getElementById('page-preloader');
-        if (!preloader.classList.contains('done')) {
-            preloader.classList.add('done');
-        }
-    }, 1000);
-};
-// ----------------------------
+const requestURL = 'http://contest.elecard.ru/frontend_data/catalog.json',
+    radioDate = document.querySelector('[value="date"]'),
+    radioСategory = document.querySelector('[value="category"]'),
+    radioSize = document.querySelector('[value="size"]'),
+    sortForm = document.querySelector('.footer__form');
+
+let dataAray;
 
 // -------- Constructor for cards --------
 class Card {
@@ -21,10 +18,10 @@ class Card {
         this.size = size;
         this.parent = document.querySelector(parentSelector);
         this.classes = classes;
-        this.changeDate();
+        this.getDate();
     }
 
-    changeDate() {
+    getDate() {
         let d = new Date(this.date);
         this.date = (d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear());
     }
@@ -40,19 +37,21 @@ class Card {
         }
 
         element.innerHTML = `
-        <img src=${this.src} alt=${this.alt}>
-        <div class="cards__item__title">${this.title}</div>
-        <div class="cards__item__date">${this.date}</div>
+        <div class="cards__item__img">
+            <img src=${this.src} alt=${this.alt}>
+        </div>
+        <div class="cards__item__discr">
+            <div class="cards__item__title">${this.title}</div>
+            <div class="cards__item__date">${this.date}</div>
+        </div>
         <div class="cards__item-close">&#10006;</div>
         `;
         this.parent.append(element);
     }
 }
-// ------------------------------
 
-// -------- Get Request and  --------
-const requestURL = 'http://contest.elecard.ru/frontend_data/catalog.json';
 
+// -------- Get Request --------
 function sendRequest(method, url) {
     const request = new XMLHttpRequest();
 
@@ -61,24 +60,8 @@ function sendRequest(method, url) {
     request.onload = () => {
         if (request.status < 400) {
             const data = JSON.parse(request.response);
-
-            data.forEach(item => {
-                new Card(
-                    'http://contest.elecard.ru/frontend_data/'+item.image,
-                    item.category,
-                    item.category,
-                    item.timestamp,
-                    item.size,
-                    '.content .cards',
-                    'cards__item',
-                ).render();
-            });
-
-            document.querySelectorAll('.cards__item-close').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    btn.parentElement.remove();
-                });
-            });
+            dataAray = Array.from(data);
+            createPage(dataAray);
         } else {
             console.error(request.response);
         }
@@ -88,12 +71,83 @@ function sendRequest(method, url) {
     };
     request.send();
 }
-
 sendRequest('GET', requestURL);
-// ---------------------------------------
 
-const cards = document.querySelector('.cards');
 
-cards.onload = () => {
-    console.log('Loaded');
-};
+// -------- Add Preloader --------
+function showPreloader() {
+    const images = document.querySelectorAll('img'),
+        imagesTotalCount = images.length,
+        preloader = document.getElementById('page-preloader'),
+        percDisplay = document.querySelector('.preloader__perc');
+    let imagesLoadedCount = 0;
+
+    for (let i = 0; i < imagesTotalCount; i++) {
+        let imageClone = new Image();
+
+        imageClone.onload = imageLoaded;
+        imageClone.onerror = imageLoaded;
+        imageClone.src = images[i].src;
+    }
+
+    function imageLoaded() {
+        imagesLoadedCount++;
+        percDisplay.innerHTML = (((100 / imagesTotalCount) * imagesLoadedCount) << 0) + '%';
+
+        if (imagesLoadedCount >= imagesTotalCount) {
+            setTimeout(() => {
+                if (!preloader.classList.contains('done')) {
+                    preloader.classList.add('done');
+                }
+            }, 1000);
+        }
+    }
+}
+
+
+// -------- Sort --------
+sortForm.addEventListener('click', () => {
+    if (radioDate.checked) {
+        dataAray.sort((a, b) => a.timestamp > b.timestamp ? 1 : -1);
+        createPage(dataAray);
+    } else if (radioSize.checked) {
+        dataAray.sort((a, b) => a.filesize > b.filesize ? 1 : -1);
+        createPage(dataAray);
+    } else {
+        dataAray.sort((a, b) => a.category > b.category ? 1 : -1);
+        createPage(dataAray);
+    }
+});
+
+
+// -------- Create Page --------
+function createPage(dataAray) {
+    document.querySelector('.cards').innerHTML = "";
+
+    dataAray.forEach(item => {
+        new Card(
+            'http://contest.elecard.ru/frontend_data/' + item.image,
+            item.category,
+            item.category,
+            item.timestamp,
+            item.size,
+            '.content .cards',
+            'cards__item',
+        ).render();
+    });
+    removeCard();
+    showPreloader();
+}
+
+
+// -------- Remove Card --------
+function removeCard() {
+    document.querySelectorAll('.cards__item-close').forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            btn.parentElement.remove();
+            dataAray.splice(i, 1);
+            createPage(dataAray);
+            console.log(dataAray);
+        });
+    });
+}
