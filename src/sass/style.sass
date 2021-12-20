@@ -35,6 +35,19 @@
     display: flex
     flex-wrap: wrap
     justify-content: space-evenly
+    &__pagination
+        text-align: center
+        margin: 10px 0 30px 0
+    &__pagination li
+        display: inline
+        border: 2px solid #404040
+        margin: 0 2px
+        padding: 5px
+        list-style-type: none
+        cursor: pointer
+        &.active
+            border: 3px solid red
+
     &__item
         position: relative
         flex: 0 1 25%

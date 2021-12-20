@@ -109,22 +109,61 @@ function showPreloader() {
 sortForm.addEventListener('click', () => {
     if (radioDate.checked) {
         dataAray.sort((a, b) => a.timestamp > b.timestamp ? 1 : -1);
-        createPage(dataAray);
+        showPage(listItem[0]);
     } else if (radioSize.checked) {
         dataAray.sort((a, b) => a.filesize > b.filesize ? 1 : -1);
-        createPage(dataAray);
+        showPage(listItem[0]);
     } else {
         dataAray.sort((a, b) => a.category > b.category ? 1 : -1);
-        createPage(dataAray);
+        showPage(listItem[0]);
     }
 });
 
 
 // -------- Create Page --------
-function createPage(dataAray) {
+const pagination = document.querySelector('.cards__pagination'),
+    numOfCards = 21;
+let listItem = [],
+    active;
+
+function createPage() {
+    const numOfLists = Math.ceil(dataAray.length / numOfCards);
+
+    for (let i = 1; i <= numOfLists; i++) {
+        const li = document.createElement('li');
+        li.innerHTML = i;
+        pagination.append(li);
+        listItem.push(li);
+    }
+
+    showPage(listItem[0]);
+    showPreloader();
+
+    listItem.forEach(item => {
+        item.addEventListener('click', function () {
+            showPage(this);
+        });
+    });
+}
+
+function showPage(activeListItem) {
+    // Active Page
+    if (active) {
+        active.classList.remove('active');
+    }
+    active = activeListItem;
+    activeListItem.classList.add('active');
+
+    // Pages count
+    let pageNum = +activeListItem.innerHTML,
+        startPage = (pageNum - 1) * numOfCards,
+        endPage = startPage + numOfCards,
+        notes = dataAray.slice(startPage, endPage);
+
+    // Create Cards
     document.querySelector('.cards').innerHTML = "";
 
-    dataAray.forEach(item => {
+    notes.forEach(item => {
         new Card(
             'http://contest.elecard.ru/frontend_data/' + item.image,
             item.category,
@@ -134,9 +173,15 @@ function createPage(dataAray) {
             '.content .cards',
             'cards__item',
         ).render();
+        removeCard();
     });
-    removeCard();
-    showPreloader();
+}
+
+
+// ---------- Create Localstorage --------
+function setLocalStorage(array) {
+    localStorage.clear();
+    localStorage.setItem(array, JSON.stringify(array));
 }
 
 
@@ -146,8 +191,8 @@ function removeCard() {
         btn.addEventListener('click', () => {
             btn.parentElement.remove();
             dataAray.splice(i, 1);
-            createPage(dataAray);
-            console.log(dataAray);
+            showPage(listItem[0]);
+            setLocalStorage(dataAray);
         });
     });
 }
