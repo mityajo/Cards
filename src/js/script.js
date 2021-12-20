@@ -158,12 +158,12 @@ function showPage(activeListItem) {
     let pageNum = +activeListItem.innerHTML,
         startPage = (pageNum - 1) * numOfCards,
         endPage = startPage + numOfCards,
-        notes = dataAray.slice(startPage, endPage);
+        displayCards = dataAray.slice(startPage, endPage);
 
     // Create Cards
     document.querySelector('.cards').innerHTML = "";
 
-    notes.forEach(item => {
+    displayCards.forEach(item => {
         new Card(
             'http://contest.elecard.ru/frontend_data/' + item.image,
             item.category,
@@ -173,8 +173,8 @@ function showPage(activeListItem) {
             '.content .cards',
             'cards__item',
         ).render();
-        removeCard();
     });
+    removeCard();
 }
 
 
